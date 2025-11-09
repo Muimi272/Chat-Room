@@ -1,2 +1,2 @@
 # Chat-Room
-A Chat Room made by Java.
+A Chat Room based on Java.
