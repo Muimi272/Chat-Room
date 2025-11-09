@@ -1,0 +1,22 @@
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public class Main {
+    private static CopyOnWriteArrayList<OutputStream> osl;
+    private static CopyOnWriteArrayList<String> allMemberNames;
+    public static void main(String[] args) throws IOException {
+        osl = new CopyOnWriteArrayList<>();
+        ServerSocket serverSocket = new ServerSocket(10000);
+        System.out.println("服务器启动在端口 10000...");
+        allMemberNames = new CopyOnWriteArrayList<>();
+        while(true){
+            Socket clientSocket = serverSocket.accept();
+            OutputStream myOS = clientSocket.getOutputStream();
+            osl.add(myOS);
+            new ClientHandler(clientSocket,osl,myOS,allMemberNames).start();
+        }
+    }
+}
