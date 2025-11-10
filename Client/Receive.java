@@ -10,7 +10,7 @@ public class Receive implements Runnable {
         this.socket = socket;
         this.name = name;
     }
-
+    @Override
     public void run() {
         try {
             InputStream is = socket.getInputStream();
