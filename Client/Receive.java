@@ -4,12 +4,14 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class Receive implements Runnable {
-    private Socket socket;
-    private String name;
-    public Receive(Socket socket , String name ) {
+    private final Socket socket;
+    private final String name;
+
+    public Receive(Socket socket, String name) {
         this.socket = socket;
         this.name = name;
     }
+
     @Override
     public void run() {
         try {
@@ -20,8 +22,11 @@ public class Receive implements Runnable {
             while ((c = isr.read()) != -1) {
                 sb.append((char) c);
                 if (c == '\n') {
-                    if (sb.toString().substring(0,name.length()+1).equals(name + ":")) {
+                    if (sb.substring(0, name.length() + 1).equals(name + ":")) {
                         sb.setLength(0);
+                    } else if (sb.toString().equals("Admin:你已被踢出聊天\n")) {
+                        System.out.println(sb);
+                        throw new IOException("服务器终止了连接。");
                     } else {
                         System.out.print(sb);
                         sb.setLength(0);
