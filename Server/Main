@@ -12,6 +12,7 @@ public class Main {
         ServerSocket serverSocket = new ServerSocket(10000);
         System.out.println("服务器启动在端口 10000...");
         allMemberNames = new CopyOnWriteArrayList<>();
+        ChatLogger.creatPW();
         while(true){
             Socket clientSocket = serverSocket.accept();
             OutputStream myOS = clientSocket.getOutputStream();
