@@ -49,6 +49,7 @@ Build & Run (exact commands)
 
 2) Build and run the client
 - Prepare address.json in the repository root (see format below).
+- Use the Setter under Client-IP-Setter to generate or change the address.json .
 - From the repository root, compile only the client-side sources into an output directory:
   ```bash
   javac -d out client/*.java
@@ -163,6 +164,7 @@ Chat-Room（聊天室）
 
 2）构建并运行客户端
 - 在仓库根目录准备 address.json
+- 使用 Client-IP-Setter 下的 Setter 生成或更改 address.json
 - 仅编译 client 目录下的客户端源码：
   ```
   javac -d out client/*.java
