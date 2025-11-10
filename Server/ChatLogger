@@ -1,0 +1,15 @@
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class ChatLogger {
+    private final static File file = new File("log.txt");
+    private static PrintWriter pw;
+    public static void creatPW() throws FileNotFoundException {
+        pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("log.txt", true))),true);
+    }
+
+    public static void log(String msg) throws FileNotFoundException {
+        pw.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":\n        " + msg);
+    }
+}
