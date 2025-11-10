@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class Client {
@@ -16,7 +15,12 @@ public class Client {
     }
 
     public void creatSocket() throws IOException {
-        this.socket = new Socket("10.18.166.249", 10000);
+        FileReader fr = new FileReader(new File("address.json"));
+        BufferedReader br = new BufferedReader(fr);
+        String s = br.readLine();
+        this.socket = new Socket(s.substring(3), 10000);
+        br.close();
+        fr.close();
     }
 
     public void sendMassage(String s) throws IOException {
