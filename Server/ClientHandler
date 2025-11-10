@@ -35,6 +35,7 @@ public class ClientHandler extends Thread {
                         case "chat":
                             System.out.print(request[1]);
                             broadCast(request[1]);
+                            ChatLogger.log(request[1]);
                             break;
                         case "join":
                             allMemberNames.add(request[1].substring(0, request[1].length() - 6));
@@ -43,6 +44,7 @@ public class ClientHandler extends Thread {
                             System.out.println(allMemberNames);
                             System.out.println("当前" + allMemberNames.size() + "名用户在线");
                             broadCast(request[1]);
+                            ChatLogger.log(request[1]);
                             break;
                         case "away":
                             allMemberNames.remove(request[1].substring(0, request[1].length() - 6));
@@ -51,6 +53,7 @@ public class ClientHandler extends Thread {
                             System.out.println(allMemberNames);
                             System.out.println("当前" + allMemberNames.size() + "名用户在线");
                             broadCast(request[1]);
+                            ChatLogger.log(request[1]);
                             break;
                     }
                     sb.setLength(0);
