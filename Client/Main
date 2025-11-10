@@ -9,6 +9,13 @@ public class Main {
         System.out.print("请输入你的ID：");
         String name = scanner.nextLine().trim();
         client.setName(name);
+        try {
+            System.out.println("正在连接服务器...");
+            Thread.sleep(3000);
+            System.out.println("服务器连接成功");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Receive receive = new Receive(client.getSocket(),name);
         client.joinRoom();
         new Thread(receive).start();
