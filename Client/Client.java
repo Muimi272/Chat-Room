@@ -15,7 +15,7 @@ public class Client {
     }
 
     public void creatSocket() throws IOException {
-        FileReader fr = new FileReader(new File("address.json"));
+        FileReader fr = new FileReader("address.json");
         BufferedReader br = new BufferedReader(fr);
         String s = br.readLine();
         this.socket = new Socket(s.substring(3), 10000);
@@ -24,7 +24,7 @@ public class Client {
     }
 
     public void sendMassage(String s) throws IOException {
-        if (s.isEmpty()||s.equals("\n")) {
+        if (s.isEmpty() || s.equals("\n")) {
             System.out.println("系统提示：消息内容不能为空！");
         } else {
             OutputStream os = socket.getOutputStream();
