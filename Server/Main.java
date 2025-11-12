@@ -20,9 +20,7 @@ public class Main {
             new ClientHandler(clientSocket, osl, myOS, allMemberNames).start();
         }
     }
-
-
-    static void send(CopyOnWriteArrayList<OutputStream> osl, String input) {
+    public static void send(CopyOnWriteArrayList<OutputStream> osl, String input) {
         for (OutputStream os : osl) {
             try {
                 os.write(input.getBytes());
