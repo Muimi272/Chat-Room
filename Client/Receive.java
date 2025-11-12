@@ -22,19 +22,37 @@ public class Receive implements Runnable {
             while ((c = isr.read()) != -1) {
                 sb.append((char) c);
                 if (c == '\n') {
-                    if (sb.substring(0, name.length() + 1).equals(name + ":")) {
-                        sb.setLength(0);
-                    } else if (sb.toString().equals("Admin:你已被踢出聊天\n")) {
-                        System.out.println(sb);
-                        throw new IOException("服务器终止了连接。");
-                    } else {
-                        System.out.print(sb);
-                        sb.setLength(0);
+                    String message = sb.toString();
+                    if (message.equals("Admin:你已被踢出聊天\n")) {
+                        System.out.print(message);
+                        System.out.println("服务器终止了连接。");
+                        System.exit(0);
                     }
+                    if (shouldDisplayMessage(message)) {
+                        System.out.print(message);
+                    }
+                    sb.setLength(0);
                 }
             }
         } catch (IOException e) {
             System.out.println("服务器断开连接：" + e.getMessage());
         }
     }
+
+    private boolean shouldDisplayMessage(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return false;
+        }
+        String trimmedMessage = message.trim();
+        if (trimmedMessage.startsWith(name + ":")) {
+            return false;
+        }
+        if (message.startsWith("\n" + name + ":") ||
+                message.startsWith("\r\n" + name + ":") ||
+                message.contains("\n" + name + ":")) {
+            return false;
+        }
+        return true;
+    }
 }
+
