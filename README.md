@@ -35,11 +35,11 @@ Build & Run (exact commands)
 1) Build and run the server
 - From the repository root, compile only the server-side sources into an output directory:
   ```bash
-  javac -d out server/*.java
+  javac -encoding UTF-8 -d out server/*.java
   ```
 - Run the server Main (run from the compiled server classes):
   ```bash
-  java -cp out Main
+  java -Dfile.encoding=UTF-8 -cp out Main
   ```
 - Expected console output:
   ```
@@ -52,22 +52,22 @@ Build & Run (exact commands)
 - Use the Setter under Client-IP-Setter to generate or change the address.json .
 - From the repository root, compile only the client-side sources into an output directory:
   ```bash
-  javac -d out client/*.java
+  javac -encoding UTF-8 -d out client/*.java
   ```
 - Run the client Main (run from the compiled client classes):
   ```bash
-  java -cp out Main
+  java -Dfile.encoding=UTF-8 -cp out Main
   ```
 - The client will prompt for an ID and then attempt to connect to the server at port 10000.
 
 address.json (required by the client)
-- The client reads the first line of address.json into a String s and uses s.substring(3) as the host. To make this work, put the host after a two-character prefix and a colon, for example:
+- The client reads the first line of address.json into a String s and uses s.substring(3) as the host and port. To make this work, put the host after a two-character prefix and a colon, for example:
   ```
-  ip:127.0.0.1
+  ip:127.0.0.1:10000
   ```
   or
   ```
-  ip:localhost
+  ip:localhost:10000
   ```
 - With "ip:127.0.0.1", s.substring(3) yields "127.0.0.1" which the client uses as the hostname.
 
@@ -151,11 +151,11 @@ Chat-Room（聊天室）
 1）构建并运行服务器
 - 在仓库根目录下，仅编译 server 目录下的服务端源码：
   ```
-  javac -d out server/*.java
+  javac -encoding UTF-8 -d out server/*.java
   ```
 - 运行服务器 Main：
   ```
-  java -cp out Main
+  java -Dfile.encoding=UTF-8 -cp out Main
   ```
 - 控制台示例输出：
   ```
@@ -167,21 +167,21 @@ Chat-Room（聊天室）
 - 使用 Client-IP-Setter 下的 Setter 生成或更改 address.json
 - 仅编译 client 目录下的客户端源码：
   ```
-  javac -d out client/*.java
+  javac -encoding UTF-8 -d out client/*.java
   ```
 - 运行客户端 Main：
   ```
-  java -cp out Main
+  java -Dfile.encoding=UTF-8 -cp out Main
   ```
 
 address.json（客户端必需）
-- 客户端读取 address.json 的第一行为字符串 s，并使用 s.substring(3) 作为主机名。请按如下格式写入第一行（纯文本）：
+- 客户端读取 address.json 的第一行为字符串 s，并使用 s.substring(3) 作为主机名和端口。请按如下格式写入第一行（纯文本）：
   ```
-  ip:127.0.0.1
+  ip:127.0.0.1:10000
   ```
   或
   ```
-  ip:localhost
+  ip:localhost:10000
   ```
 
 消息协议
