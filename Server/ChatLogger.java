@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -6,7 +7,7 @@ public class ChatLogger {
     private static PrintWriter pw;
 
     public static void creatPW() throws FileNotFoundException {
-        pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("log.txt", true))), true);
+        pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("log.txt", true), StandardCharsets.UTF_8)), true);
     }
 
     public static void log(String msg) throws FileNotFoundException {
