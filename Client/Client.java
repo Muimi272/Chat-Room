@@ -18,7 +18,7 @@ public class Client {
         FileReader fr = new FileReader("address.json");
         BufferedReader br = new BufferedReader(fr);
         String s = br.readLine();
-        this.socket = new Socket(s.substring(3), 10000);
+        this.socket = new Socket(s.substring(3).split(":")[0], Integer.parseInt(s.substring(3).split(":")[1]));
         br.close();
         fr.close();
     }
