@@ -10,7 +10,7 @@ public class ClientHandler extends Thread {
     private final CopyOnWriteArrayList<OutputStream> osl;
     private final OutputStream myOutputStream;
     private final CopyOnWriteArrayList<String> allMemberNames;
-    private static String userName;
+    private String userName;
 
     public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames) {
         this.socket = socket;
@@ -86,6 +86,7 @@ public class ClientHandler extends Thread {
             }
             case "join:" -> {
                 String introduce = request.substring(5);
+                userName = introduce.substring(0, introduce.length() - 6);
                 yield new String[]{"join", introduce};
             }
             case "away:" -> {
@@ -102,6 +103,7 @@ public class ClientHandler extends Thread {
 
     private void cleanup() {
         osl.remove(myOutputStream);
+        allMemberNames.remove(userName);
         System.out.println("已从客户端列表中移除一个连接，当前连接数: " + osl.size());
         try {
             myOutputStream.close();
