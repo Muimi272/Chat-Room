@@ -7,7 +7,7 @@ public class Main {
         client.creatSocket();
         Scanner scanner = new Scanner(System.in);
         System.out.print("请输入你的ID：");
-        String name = scanner.next().trim();
+        String name = scanner.nextLine().trim();
         client.setName(name);
         try {
             System.out.println("正在连接服务器...");
