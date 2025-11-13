@@ -11,12 +11,14 @@ public class ClientHandler extends Thread {
     private final OutputStream myOutputStream;
     private final CopyOnWriteArrayList<String> allMemberNames;
     private String userName;
+    private final CopyOnWriteArrayList<String> legalMemberName;
 
-    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames) {
+    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberName) {
         this.socket = socket;
         this.osl = osl;
         this.myOutputStream = myOutputStream;
         this.allMemberNames = allMemberNames;
+        this.legalMemberName = legalMemberName;
     }
 
     @Override
@@ -40,13 +42,19 @@ public class ClientHandler extends Thread {
                                 ChatLogger.log(request[1]);
                                 break;
                             case "join":
-                                allMemberNames.add(request[1].substring(0, request[1].length() - 6));
-                                System.out.println(request[1].substring(0, request[1].length() - 6) + "加入了聊天");
-                                System.out.print("当前在线用户：");
-                                System.out.println(allMemberNames);
-                                System.out.println("当前" + allMemberNames.size() + "名用户在线");
-                                broadCast(request[1]);
-                                ChatLogger.log(request[1]);
+                                if (legalMemberName.contains(request[1].substring(0, request[1].length() - 6))) {
+                                    allMemberNames.add(request[1].substring(0, request[1].length() - 6));
+                                    System.out.println(request[1].substring(0, request[1].length() - 6) + "加入了聊天");
+                                    System.out.print("当前在线用户：");
+                                    System.out.println(allMemberNames);
+                                    System.out.println("当前" + allMemberNames.size() + "名用户在线");
+                                    broadCast(request[1]);
+                                    ChatLogger.log(request[1]);
+                                } else {
+                                    myOutputStream.write("[Admin]无权限加入此聊天室！请联系管理员获取权限\n".getBytes());
+                                    osl.remove(myOutputStream);
+                                    closeConnect();
+                                }
                                 break;
                             case "away":
                                 allMemberNames.remove(request[1].substring(0, request[1].length() - 6));
@@ -71,7 +79,6 @@ public class ClientHandler extends Thread {
             cleanup();
         }
     }
-
 
     private String[] handleContent(StringBuilder sb) {
         if (sb.toString().isEmpty()) {
@@ -105,6 +112,10 @@ public class ClientHandler extends Thread {
         osl.remove(myOutputStream);
         allMemberNames.remove(userName);
         System.out.println("已从客户端列表中移除一个连接，当前连接数: " + osl.size());
+        closeConnect();
+    }
+
+    private void closeConnect() {
         try {
             myOutputStream.close();
         } catch (IOException e) {
