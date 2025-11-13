@@ -5,10 +5,13 @@ import java.net.Socket;
 
 public class Receive implements Runnable {
     private final Socket socket;
-    private final String name;
+    private String name;
 
-    public Receive(Socket socket, String name) {
+    public Receive(Socket socket) {
         this.socket = socket;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -23,9 +26,12 @@ public class Receive implements Runnable {
                 sb.append((char) c);
                 if (c == '\n') {
                     String message = sb.toString();
-                    if (message.equals("Admin:你已被踢出聊天\n")) {
+                    if (message.equals("[Admin]你已被踢出聊天\n")) {
                         System.out.print(message);
                         System.out.println("服务器终止了连接。");
+                        System.exit(0);
+                    } else if (message.equals("[Admin]无权限加入此聊天室！请联系管理员获取权限\n")) {
+                        System.out.print(message);
                         System.exit(0);
                     }
                     if (shouldDisplayMessage(message)) {
@@ -47,12 +53,9 @@ public class Receive implements Runnable {
         if (trimmedMessage.startsWith(name + ":")) {
             return false;
         }
-        if (message.startsWith("\n" + name + ":") ||
-                message.startsWith("\r\n" + name + ":") ||
-                message.contains("\n" + name + ":")) {
-            return false;
-        }
-        return true;
+        return !message.startsWith("\n" + name + ":") &&
+                !message.startsWith("\r\n" + name + ":") &&
+                !message.contains("\n" + name + ":");
     }
 }
 
