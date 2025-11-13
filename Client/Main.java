@@ -5,10 +5,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Client client = new Client();
         client.creatSocket();
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("请输入你的ID：");
-        String name = scanner.nextLine().trim();
-        client.setName(name);
         try {
             System.out.println("正在连接服务器...");
             Thread.sleep(1000);
@@ -16,7 +12,13 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Receive receive = new Receive(client.getSocket(), name);
+        Receive receive = new Receive(client.getSocket());
+        Scanner scanner = new Scanner(System.in);
+        String name;
+        System.out.print("请输入你的ID：");
+        name = scanner.nextLine().trim();
+        client.setName(name);
+        receive.setName(name);
         client.joinRoom();
         new Thread(receive).start();
         while (true) {
