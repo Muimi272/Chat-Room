@@ -6,7 +6,7 @@ public class Admin {
     private static CopyOnWriteArrayList<OutputStream> osl;
     private static String name;
 
-    public static void startAdminConsole(CopyOnWriteArrayList<OutputStream> osl, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberNames) {
+    public static void startAdminConsole(CopyOnWriteArrayList<OutputStream> osl, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberNames, CopyOnWriteArrayList<String> legalMemberPasswords) {
         Admin.osl = osl;
         name = "Host";
         Thread thread = new Thread(() -> {
@@ -25,6 +25,15 @@ public class Admin {
                         case "\\showAll" -> {
                             System.out.println("当前在线用户：" + allMemberNames);
                             System.out.println("当前共有" + allMemberNames.size() + "名用户在线");
+                        }
+                        case "\\showLegal" -> {
+                            System.out.println("所有可加入聊天用户名及密码：");
+                            String head = String.format("%-20s%-20s", "用户名", "密码");
+                            System.out.println(head);
+                            for (int i = 0; i < legalMemberNames.size(); i++) {
+                                String line = String.format("%-20s%-20s", legalMemberNames.get(i), legalMemberPasswords.get(i));
+                                System.out.println(line);
+                            }
                         }
                         case "\\kick" -> {
                             System.out.println("Which one do you want to kick?");
@@ -57,7 +66,6 @@ public class Admin {
                         }
                         case "\\broadcast" -> {
                             System.out.print("请输入广播内容：");
-                            command.nextLine();
                             String content = command.nextLine();
                             Main.send(Admin.osl, "[All]" + content + "\n");
                             System.out.println("[All]" + content);
@@ -65,20 +73,23 @@ public class Admin {
                         case "\\add" -> {
                             System.out.print("请输入用户ID：");
                             command.nextLine();
-                            String content = command.nextLine();
-                            if (legalMemberNames.contains(content)) {
+                            String name = command.nextLine();
+                            System.out.print("请输入用户密码：");
+                            String password = command.nextLine();
+                            if (legalMemberNames.contains(name)) {
                                 try {
-                                    cleanNull(legalMemberNames);
-                                    System.out.println("已存在用户" + content);
+                                    writeup(legalMemberNames, legalMemberPasswords);
+                                    System.out.println("已存在用户" + name);
                                     System.out.print("目前可加入聊天的用户：");
                                     System.out.println(legalMemberNames);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
                             } else {
-                                legalMemberNames.add(content);
+                                legalMemberNames.add(name);
+                                legalMemberPasswords.add(password);
                                 try {
-                                    cleanNull(legalMemberNames);
+                                    writeup(legalMemberNames, legalMemberPasswords);
                                     System.out.print("目前可加入聊天的用户：");
                                     System.out.println(legalMemberNames);
                                 } catch (IOException e) {
@@ -89,20 +100,21 @@ public class Admin {
                         case "\\remove" -> {
                             System.out.print("请输入用户ID：");
                             command.nextLine();
-                            String content = command.nextLine();
-                            if (!(legalMemberNames.contains(content))) {
+                            String name = command.nextLine();
+                            if (!(legalMemberNames.contains(name))) {
                                 try {
-                                    cleanNull(legalMemberNames);
-                                    System.out.println("不存在用户" + content);
+                                    writeup(legalMemberNames, legalMemberPasswords);
+                                    System.out.println("不存在用户" + name);
                                     System.out.print("目前可加入聊天的用户：");
                                     System.out.println(legalMemberNames);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
                             } else {
-                                legalMemberNames.remove(content);
+                                legalMemberPasswords.remove(legalMemberNames.indexOf(name));
+                                legalMemberNames.remove(name);
                                 try {
-                                    cleanNull(legalMemberNames);
+                                    writeup(legalMemberNames, legalMemberPasswords);
                                     System.out.print("目前可加入聊天的用户：");
                                     System.out.println(legalMemberNames);
                                 } catch (IOException e) {
@@ -119,6 +131,9 @@ public class Admin {
                             System.out.println("\\remove\t删除可连接的用户");
                             System.out.println("\\exit\t\t关闭服务器");
                         }
+                        default -> {
+                            System.out.println("命令不存在");
+                        }
                     }
                 } else {
                     broadCast(osl, input);
@@ -128,16 +143,10 @@ public class Admin {
         thread.start();
     }
 
-    private static void cleanNull(CopyOnWriteArrayList<String> legalMemberNames) throws IOException {
+    private static void writeup(CopyOnWriteArrayList<String> legalMemberNames, CopyOnWriteArrayList<String> legalMemberPasswords) throws IOException {
         BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Members.json")));
-        while (legalMemberNames.remove("")) {
-        }
-        while (legalMemberNames.remove("\n")) {
-        }
-        while (legalMemberNames.remove(" ")) {
-        }
-        for (String legalMemberName : legalMemberNames) {
-            bf.write(legalMemberName + "\n");
+        for (int i = 0; i < legalMemberNames.size(); i++) {
+            bf.write(legalMemberNames.get(i) + ":" + legalMemberPasswords.get(i) + "\n");
         }
         bf.close();
     }
