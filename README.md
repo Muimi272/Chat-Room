@@ -7,7 +7,7 @@ Project Name
 Chat-Room
 
 Short Description  
-A simple console-based chat room written in pure Java. No GUI; runs in the terminal/console. The project contains separate server and client implementations. The server listens on TCP port 10000 (hard-coded). The client reads the server address from address.json and connects to port 10000. No external frameworks or third-party libraries are required.
+A console-based chat room written in pure Java. No GUI; runs in the terminal/console. The project contains separate server and client implementations. The server listens on TCP port 10000 (hard-coded). The client reads the server address from address.json and connects to port 10000. No external frameworks or third-party libraries are required.
 
 Prerequisites
 - Java Development Kit (JDK) 8 or later, recommended JDK 23
@@ -44,7 +44,7 @@ Build & Run (exact commands)
   ```
 - Example console output:
   ```
-  服务器启动在端口 10000...
+  Server started on port 10000...
   ```
 
 2) Build and run the client
@@ -70,20 +70,21 @@ address.json (required by client)
   ```
 
 Members.json (required by server)
-- The server reads the content of Members.json line by line, and adds it to CopyOnWriteArrayList<String> legalMembersName via the add() method, which serves as the unique identification for whether the client can connect. Please write in the following format:
+- The server reads the content of Members.json line by line, and adds it to CopyOnWriteArrayList<String> legalMembersName via the add() method, which serves as unique identification for whether the client can connect. Please write in the following format:
   ```
-  Test
-  Username1
-  Username2
+  Test:123456
+  Username1:abcdefg
+  Username2:hijklmn
 
   ```
 - Note that usernames are separated by '\n', so a newline is still required at the end of the file.
+- Please try to keep the length of usernames and passwords within 20 characters, otherwise they cannot be fully displayed when using the \showLegal command.
 
 Message Protocol
 - All messages are text lines ending with a newline ("\n"). Message prefixes:
-  - `join:<username>加入了聊天\n`
+  - `join:<username>joined the chat\n`
   - `chat:<username>:<message>\n`
-  - `away:<username>退出了聊天\n`
+  - `away:<username>left the chat\n`
 
 Admin Console (server-side)
 - Supported commands:
@@ -94,20 +95,20 @@ Admin Console (server-side)
   - \broadcast   : Broadcast a message
   - \add         : Add a connectable username
   - \remove      : Remove a connectable username
+  - \showLegal   : Show all connectable usernames and passwords
   - \help        : Command help
 
 Client Usage
 - Enter content and press Enter to send a message
 - Enter \exit to leave the chat room and disconnect
-- If the entered username doesn't have connection permission, you will receive "[Admin]无权限加入此聊天室！请联系管理员获取权限\n"
-- If kicked by admin, you will receive "[Admin]你已被踢出聊天\n"
+- If the entered username and password are incorrect or don't exist, you will receive "[Admin]No permission to join this chat room!\n"
+- If kicked by admin, you will receive "[Admin]You have been kicked out of the chat\n"
 
 Logging
 - ChatLogger appends logs to log.txt, including timestamp and content
 
 Limitations & Recommendations
 - Port 10000 is hard-coded and can only be changed by modifying the source code
-- The parsing of address.json is recommended to use a more robust method
 - No strong authentication, no encryption (for demonstration or learning purposes only)
 
 Contributing
@@ -193,12 +194,13 @@ address.json（客户端必需）
 Members.json（服务端必需）
 - 服务端按行读取 Members.json 的内容，并被 add() 方法加入 CopyOnWirteArrayList<String> legalMembersName 中，然后被作为识别客户端能否进行连接的唯一识别。请按如下格式写入：
   ```
-  Test
-  Username1
-  Username2
+  Test:123456
+  Username1:abcdefg
+  Username2:hijklmn
 
   ```
 - 注意用户名的识别是以 '\n' 为间隔的，因此在文件末端仍然需要提行。
+- 请尽量使用户名和密码的长度在20个字符以内，否则使用 \showLegal命令时将会无法完全显示。
   
 消息协议
 - 所有消息为以换行符（"\n"）结尾的文本行。消息前缀：
@@ -215,12 +217,13 @@ Members.json（服务端必需）
   - \broadcast   ：广播消息
   - \add         ：添加可连接的用户名
   - \remove      ：删除可连接的用户名
+  - \showLegal   ：显示所有可连接的用户名及密码
   - \help        ：命令帮助
 
 客户端使用
 - 输入内容回车发送消息
 - 输入 \exit 离开聊天室并断开连接
-- 输入的用户名没有连接权限将会收到 "[Admin]无权限加入此聊天室！请联系管理员获取权限\n"
+- 输入的用户名和密码如果错误或者不存在将会收到 "[Admin]无权限加入此聊天室！\n"
 - 被管理员踢出会收到 "[Admin]你已被踢出聊天\n"
 
 日志
@@ -228,7 +231,6 @@ Members.json（服务端必需）
 
 限制建议
 - 端口 10000 为硬编码，仅可修改源码变更
-- address.json 的解析建议用更稳健方式
 - 无强认证、无加密（仅演示或学习用）
 
 贡献
