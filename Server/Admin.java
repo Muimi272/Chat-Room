@@ -115,6 +115,8 @@ public class Admin {
                             System.out.println("\\kick\t\t踢出聊天成员");
                             System.out.println("\\broadcast\t广播消息");
                             System.out.println("\\showAll\t显示在线成员");
+                            System.out.println("\\add\t\t添加可连接的用户");
+                            System.out.println("\\remove\t删除可连接的用户");
                             System.out.println("\\exit\t\t关闭服务器");
                         }
                     }
