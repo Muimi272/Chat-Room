@@ -30,7 +30,7 @@ public class Receive implements Runnable {
                         System.out.print(message);
                         System.out.println("服务器终止了连接。");
                         System.exit(0);
-                    } else if (message.equals("[Admin]无权限加入此聊天室！请联系管理员获取权限\n")) {
+                    } else if (message.equals("[Admin]无权限加入此聊天室！\n")) {
                         System.out.print(message);
                         System.exit(0);
                     }
