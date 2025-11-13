@@ -4,14 +4,19 @@ import java.net.Socket;
 public class Client {
     private Socket socket;
     private String username;
+    private String password;
 
     public void setName(String s) {
         username = s;
     }
 
+    public void setPassword(String s) {
+        password = s;
+    }
+
     public void joinRoom() throws IOException {
         OutputStream os = socket.getOutputStream();
-        os.write(("join:" + username + "加入了聊天\n").getBytes());
+        os.write(("join:" + username + ":" + password + "加入了聊天\n").getBytes());
     }
 
     public void creatSocket() throws IOException {
