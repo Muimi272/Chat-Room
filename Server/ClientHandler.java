@@ -11,14 +11,17 @@ public class ClientHandler extends Thread {
     private final OutputStream myOutputStream;
     private final CopyOnWriteArrayList<String> allMemberNames;
     private String userName;
+    private String password;
     private final CopyOnWriteArrayList<String> legalMemberName;
+    private final CopyOnWriteArrayList<String> legalMemberPasswords;
 
-    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberName) {
+    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberName, CopyOnWriteArrayList<String> legalMemberPasswords) {
         this.socket = socket;
         this.osl = osl;
         this.myOutputStream = myOutputStream;
         this.allMemberNames = allMemberNames;
         this.legalMemberName = legalMemberName;
+        this.legalMemberPasswords = legalMemberPasswords;
     }
 
     @Override
@@ -42,13 +45,13 @@ public class ClientHandler extends Thread {
                                 ChatLogger.log(request[1]);
                                 break;
                             case "join":
-                                if (legalMemberName.contains(request[1].substring(0, request[1].length() - 6))) {
-                                    allMemberNames.add(request[1].substring(0, request[1].length() - 6));
-                                    System.out.println(request[1].substring(0, request[1].length() - 6) + "加入了聊天");
+                                if (legalMemberName.contains(userName) && legalMemberPasswords.get(legalMemberName.indexOf(userName)).equals(password)) {
+                                    allMemberNames.add(userName);
+                                    System.out.println(userName + "加入了聊天");
                                     System.out.print("当前在线用户：");
                                     System.out.println(allMemberNames);
                                     System.out.println("当前" + allMemberNames.size() + "名用户在线");
-                                    broadCast(request[1]);
+                                    broadCast(userName + "加入了聊天");
                                     ChatLogger.log(request[1]);
                                 } else {
                                     myOutputStream.write("[Admin]无权限加入此聊天室！请联系管理员获取权限\n".getBytes());
@@ -93,7 +96,9 @@ public class ClientHandler extends Thread {
             }
             case "join:" -> {
                 String introduce = request.substring(5);
-                userName = introduce.substring(0, introduce.length() - 6);
+                String info = introduce.substring(0, introduce.length() - 6);
+                userName = info.split(":")[0];
+                password = info.split(":")[1];
                 yield new String[]{"join", introduce};
             }
             case "away:" -> {
