@@ -15,9 +15,13 @@ public class Main {
         Receive receive = new Receive(client.getSocket());
         Scanner scanner = new Scanner(System.in);
         String name;
+        String passwd;
         System.out.print("请输入你的ID：");
         name = scanner.nextLine().trim();
+        System.out.print("请输入" + name + "的密码：");
+        passwd = scanner.nextLine().trim();
         client.setName(name);
+        client.setPassword(passwd);
         receive.setName(name);
         client.joinRoom();
         new Thread(receive).start();
