@@ -19,7 +19,7 @@ Repository Structure
   - Admin.java
   - ClientHandler.java
   - ChatLogger.java
-  - Members.json
+  - legalMembers.ser
 - client/                 
   - Main.java
   - Client.java
@@ -69,14 +69,11 @@ address.json (required by client)
   ip:localhost:10000
   ```
 
-Members.json (required by server)
-- The server reads the content of Members.json line by line, and adds it to CopyOnWriteArrayList<String> legalMembersName via the add() method, which serves as unique identification for whether the client can connect. Please write in the following format:
-  ```
-  Test:123456
-  Username1:abcdefg
-  Username2:hijklmn
+legalMembers.ser (required by server)
 
-  ```
+The server reads the content of legalMembers.ser, which stores a serialized CopyOnWriteArrayList legalUsers.
+Use MembersCreator under Serve-Members-Creator to create a serialized file containing only the test user.
+Use the /add, /remove, and /showLegal commands in the server admin console to view or modify the serialized file.
 - Note that usernames are separated by '\n', so a newline is still required at the end of the file.
 - Please try to keep the length of usernames and passwords within 20 characters, otherwise they cannot be fully displayed when using the \showLegal command.
 
@@ -141,7 +138,7 @@ Chat-Room（聊天室）
   - Admin.java
   - ClientHandler.java
   - ChatLogger.java
-  - Members.json
+  - legalMembers.ser
 - client/                 
   - Main.java
   - Client.java
@@ -191,16 +188,10 @@ address.json（客户端必需）
   ip:localhost:10000
   ```
 
-Members.json（服务端必需）
-- 服务端按行读取 Members.json 的内容，并被 add() 方法加入 CopyOnWirteArrayList<String> legalMembersName 中，然后被作为识别客户端能否进行连接的唯一识别。请按如下格式写入：
-  ```
-  Test:123456
-  Username1:abcdefg
-  Username2:hijklmn
-
-  ```
-- 注意用户名的识别是以 '\n' 为间隔的，因此在文件末端仍然需要提行。
-- 请尽量使用户名和密码的长度在20个字符以内，否则使用 \showLegal命令时将会无法完全显示。
+legalMembers.ser（服务端必需）
+- 序列化储存 CopyOnWriteArrayList<User> legalUsers。
+- 使用Serve-Members-Creator下的MembersCreator创建只含有test用户的序列化文件。
+- 在服务端中使用 /add 、 /remove 、 /showLegal 命令查阅或更改序列化文件。
   
 消息协议
 - 所有消息为以换行符（"\n"）结尾的文本行。消息前缀：
