@@ -12,16 +12,14 @@ public class ClientHandler extends Thread {
     private final CopyOnWriteArrayList<String> allMemberNames;
     private String userName;
     private String password;
-    private final CopyOnWriteArrayList<String> legalMemberName;
-    private final CopyOnWriteArrayList<String> legalMemberPasswords;
+    private final CopyOnWriteArrayList<User> legalMembers;
 
-    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberName, CopyOnWriteArrayList<String> legalMemberPasswords) {
+    public ClientHandler(Socket socket, CopyOnWriteArrayList<OutputStream> osl, OutputStream myOutputStream, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<User> legalMembers) {
         this.socket = socket;
         this.osl = osl;
         this.myOutputStream = myOutputStream;
         this.allMemberNames = allMemberNames;
-        this.legalMemberName = legalMemberName;
-        this.legalMemberPasswords = legalMemberPasswords;
+        this.legalMembers = legalMembers;
     }
 
     @Override
@@ -45,7 +43,7 @@ public class ClientHandler extends Thread {
                                 ChatLogger.log(request[1]);
                                 break;
                             case "join":
-                                if (legalMemberName.contains(userName) && legalMemberPasswords.get(legalMemberName.indexOf(userName)).equals(password)) {
+                                if (contain(legalMembers, request[1].substring(0, request[1].length() - 6).split(":")[0]) && find(legalMembers, request[1].substring(0, request[1].length() - 6).split(":")[0]).getPassword().equals(request[1].substring(0, request[1].length() - 6).split(":")[1])) {
                                     allMemberNames.add(userName);
                                     System.out.println(userName + "加入了聊天");
                                     System.out.print("当前在线用户：");
@@ -133,5 +131,22 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             System.out.println("关闭socket时发生错误: " + e.getMessage());
         }
+    }
+    private static User find(CopyOnWriteArrayList<User> legalMembers,String remove) {
+        for (User legalMember : legalMembers) {
+            if (legalMember.getName().equals(remove)) {
+                return legalMember;
+            }
+        }
+        return null;
+    }
+
+    private static boolean contain(CopyOnWriteArrayList<User> legalMembers,String remove) {
+        for (User legalMember : legalMembers) {
+            if (legalMember.getName().equals(remove)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
