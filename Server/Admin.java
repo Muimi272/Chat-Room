@@ -6,7 +6,7 @@ public class Admin {
     private static CopyOnWriteArrayList<OutputStream> osl;
     private static String name;
 
-    public static void startAdminConsole(CopyOnWriteArrayList<OutputStream> osl, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<String> legalMemberNames, CopyOnWriteArrayList<String> legalMemberPasswords) {
+    public static void startAdminConsole(CopyOnWriteArrayList<OutputStream> osl, CopyOnWriteArrayList<String> allMemberNames, CopyOnWriteArrayList<User> legalMembers) {
         Admin.osl = osl;
         name = "Host";
         Thread thread = new Thread(() -> {
@@ -30,8 +30,8 @@ public class Admin {
                             System.out.println("所有可加入聊天用户名及密码：");
                             String head = String.format("%-20s%-20s", "用户名", "密码");
                             System.out.println(head);
-                            for (int i = 0; i < legalMemberNames.size(); i++) {
-                                String line = String.format("%-20s%-20s", legalMemberNames.get(i), legalMemberPasswords.get(i));
+                            for (User legalMember : legalMembers) {
+                                String line = String.format("%-20s%-20s", legalMember.getName(), legalMember.getPassword());
                                 System.out.println(line);
                             }
                         }
@@ -76,24 +76,28 @@ public class Admin {
                             String name = command.nextLine();
                             System.out.print("请输入用户密码：");
                             String password = command.nextLine();
-                            if (legalMemberNames.contains(name)) {
+                            boolean exists = false;
+                            for (User legalMember : legalMembers) {
+                                if (legalMember.getName().equals(name)) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists) {
                                 try {
-                                    writeup(legalMemberNames, legalMemberPasswords);
+                                    writeup(legalMembers);
                                     System.out.println("已存在用户" + name);
-                                    System.out.print("目前可加入聊天的用户：");
-                                    System.out.println(legalMemberNames);
+                                    showLegal(legalMembers);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
                             } else {
-                                legalMemberNames.add(name);
-                                legalMemberPasswords.add(password);
+                                legalMembers.add(new User(name, password));
                                 try {
-                                    writeup(legalMemberNames, legalMemberPasswords);
-                                    System.out.print("目前可加入聊天的用户：");
-                                    System.out.println(legalMemberNames);
+                                    writeup(legalMembers);
+                                    showLegal(legalMembers);
                                 } catch (IOException e) {
-                                    System.out.println("用户名写入失败，请打开文件写入");
+                                    System.out.println("用户名写入失败，请检查文件");
                                 }
                             }
                         }
@@ -101,24 +105,32 @@ public class Admin {
                             System.out.print("请输入用户ID：");
                             command.nextLine();
                             String name = command.nextLine();
-                            if (!(legalMemberNames.contains(name))) {
+                            boolean exists = false;
+                            for (User legalMember : legalMembers) {
+                                if (legalMember.getName().equals(name)) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists) {
                                 try {
-                                    writeup(legalMemberNames, legalMemberPasswords);
+                                    writeup(legalMembers);
                                     System.out.println("不存在用户" + name);
-                                    System.out.print("目前可加入聊天的用户：");
-                                    System.out.println(legalMemberNames);
+                                    showLegal(legalMembers);
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
                             } else {
-                                legalMemberPasswords.remove(legalMemberNames.indexOf(name));
-                                legalMemberNames.remove(name);
-                                try {
-                                    writeup(legalMemberNames, legalMemberPasswords);
-                                    System.out.print("目前可加入聊天的用户：");
-                                    System.out.println(legalMemberNames);
-                                } catch (IOException e) {
-                                    System.out.println("用户名写入失败，请打开文件写入");
+                                System.out.println("确认要移除" + name + "的连接权限吗？此操作不可恢复！[y/N]");
+                                String choice = command.nextLine();
+                                if (choice.equalsIgnoreCase("y") || choice.equalsIgnoreCase("Y")) {
+                                    legalMembers.remove(find(legalMembers, name));
+                                    try {
+                                        writeup(legalMembers);
+                                        showLegal(legalMembers);
+                                    } catch (IOException e) {
+                                        System.out.println("用户名写入失败，请检查文件");
+                                    }
                                 }
                             }
                         }
@@ -144,12 +156,30 @@ public class Admin {
         thread.start();
     }
 
-    private static void writeup(CopyOnWriteArrayList<String> legalMemberNames, CopyOnWriteArrayList<String> legalMemberPasswords) throws IOException {
-        BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Members.json")));
-        for (int i = 0; i < legalMemberNames.size(); i++) {
-            bf.write(legalMemberNames.get(i) + ":" + legalMemberPasswords.get(i) + "\n");
+    private static void showLegal(CopyOnWriteArrayList<User> legalMembers) {
+        System.out.print("目前可加入聊天的用户：");
+        System.out.print('[');
+        for (int i = 0; i < legalMembers.size(); i++) {
+            System.out.print(legalMembers.get(i).getName());
+            if (i < legalMembers.size() - 1) {
+                System.out.print(",");
+            }
         }
-        bf.close();
+        System.out.println(']');
+    }
+
+    private static void writeup(CopyOnWriteArrayList<User> legalMembers) throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("legalMembers.ser"));
+        oos.writeObject(legalMembers);
+    }
+
+    private static User find(CopyOnWriteArrayList<User> legalMembers, String remove) {
+        for (User legalMember : legalMembers) {
+            if (legalMember.getName().equals(remove)) {
+                return legalMember;
+            }
+        }
+        return null;
     }
 
     private static void broadCast(CopyOnWriteArrayList<OutputStream> osl, String input) {
